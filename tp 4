@@ -1,0 +1,189 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Etudiant {
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Etudiant* suivant;
+    struct Etudiant* precedent;
+} Etudiant;
+
+Etudiant* creer_etudiant() {
+    Etudiant* tmp = malloc(sizeof(Etudiant));
+    printf("ID : ");
+    scanf("%d", &tmp->id);
+    printf("Nom : ");
+    scanf(" %[^
+]", tmp->nom);
+    printf("Moyenne : ");
+    scanf("%f", &tmp->moyenne);
+    tmp->suivant = NULL;
+    tmp->precedent = NULL;
+    return tmp;
+}
+
+int longueur(Etudiant* debut) {
+    int taille = 0;
+    while (debut) {
+        taille++;
+        debut = debut->suivant;
+    }
+    return taille;
+}
+
+Etudiant* ajouter_position(Etudiant* debut, Etudiant* nouveau, int pos) {
+    if (pos <= 1 || debut == NULL) {
+        nouveau->suivant = debut;
+        if (debut) debut->precedent = nouveau;
+        return nouveau;
+    }
+    Etudiant* tmp = debut;
+    for (int i = 1; tmp->suivant && i < pos - 1; i++)
+        tmp = tmp->suivant;
+    nouveau->suivant = tmp->suivant;
+    if (tmp->suivant)
+        tmp->suivant->precedent = nouveau;
+    tmp->suivant = nouveau;
+    nouveau->precedent = tmp;
+    return debut;
+}
+
+Etudiant* supprimer_position(Etudiant* debut, int pos) {
+    if (!debut) return NULL;
+    if (pos <= 1) {
+        Etudiant* tmp = debut->suivant;
+        if (tmp) tmp->precedent = NULL;
+        free(debut);
+        return tmp;
+    }
+    Etudiant* tmp = debut;
+    for (int i = 1; tmp && i < pos; i++)
+        tmp = tmp->suivant;
+    if (!tmp) return debut;
+    if (tmp->precedent) tmp->precedent->suivant = tmp->suivant;
+    if (tmp->suivant) tmp->suivant->precedent = tmp->precedent;
+    free(tmp);
+    return debut;
+}
+
+void afficher_liste(Etudiant* debut) {
+    while (debut) {
+        printf("ID: %d | Nom: %s | Moyenne: %.2f\n", debut->id, debut->nom, debut->moyenne);
+        debut = debut->suivant;
+    }
+}
+
+Etudiant* derniere_cellule(Etudiant* debut) {
+    if (!debut) return NULL;
+    while (debut->suivant)
+        debut = debut->suivant;
+    return debut;
+}
+
+void afficher_liste_inverse(Etudiant* debut) {
+    Etudiant* dernier = derniere_cellule(debut);
+    while (dernier) {
+        printf("ID: %d | Nom: %s | Moyenne: %.2f\n", dernier->id, dernier->nom, dernier->moyenne);
+        dernier = dernier->precedent;
+    }
+}
+
+int chercher_etudiant(Etudiant* debut, int id) {
+    while (debut) {
+        if (debut->id == id) return 1;
+        debut = debut->suivant;
+    }
+    return 0;
+}
+
+Etudiant* tri(Etudiant* debut) {
+    if (!debut) return NULL;
+    Etudiant* ptr = debut;
+    while (ptr) {
+        Etudiant* tmp = ptr->suivant;
+        while (tmp) {
+            if (ptr->moyenne > tmp->moyenne) {
+                float moy = ptr->moyenne;
+                ptr->moyenne = tmp->moyenne;
+                tmp->moyenne = moy;
+
+                int id = ptr->id;
+                ptr->id = tmp->id;
+                tmp->id = id;
+
+                char nom[50];
+                strcpy(nom, ptr->nom);
+                strcpy(ptr->nom, tmp->nom);
+                strcpy(tmp->nom, nom);
+            }
+            tmp = tmp->suivant;
+        }
+        ptr = ptr->suivant;
+    }
+    return debut;
+}
+
+Etudiant* modifier_moyenne(Etudiant* debut, int pos, float nouvelle_moyenne) {
+    Etudiant* tmp = debut;
+    for (int i = 1; tmp && i < pos; i++)
+        tmp = tmp->suivant;
+    if (tmp) tmp->moyenne = nouvelle_moyenne;
+    return debut;
+}
+
+int main() {
+    Etudiant* debut = NULL;
+    int choix;
+    do {
+        printf("\nMenu:\n");
+        printf("1. Ajouter un etudiant\n");
+        printf("2. Supprimer un etudiant\n");
+        printf("3. Afficher la liste\n");
+        printf("4. Trier par moyenne\n");
+        printf("5. Afficher en sens inverse\n");
+        printf("6. Chercher un etudiant\n");
+        printf("7. Modifier moyenne\n");
+        printf("0. Quitter\n");
+        scanf("%d", &choix);
+
+        if (choix == 1) {
+            int pos;
+            printf("Position : ");
+            scanf("%d", &pos);
+            Etudiant* nouveau = creer_etudiant();
+            debut = ajouter_position(debut, nouveau, pos);
+        } else if (choix == 2) {
+            int pos;
+            printf("Position : ");
+            scanf("%d", &pos);
+            debut = supprimer_position(debut, pos);
+        } else if (choix == 3) {
+            afficher_liste(debut);
+        } else if (choix == 4) {
+            debut = tri(debut);
+        } else if (choix == 5) {
+            afficher_liste_inverse(debut);
+        } else if (choix == 6) {
+            int id;
+            printf("ID a chercher : ");
+            scanf("%d", &id);
+            if (chercher_etudiant(debut, id))
+                printf("Etudiant trouve.\n");
+            else
+                printf("Etudiant non trouve.\n");
+        } else if (choix == 7) {
+            int pos;
+            float nouvelle_moyenne;
+            printf("Position : ");
+            scanf("%d", &pos);
+            printf("Nouvelle moyenne : ");
+            scanf("%f", &nouvelle_moyenne);
+            debut = modifier_moyenne(debut, pos, nouvelle_moyenne);
+        }
+
+    } while (choix != 0);
+
+    return 0;
+}
