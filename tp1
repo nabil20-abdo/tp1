@@ -1,0 +1,304 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+
+typedef struct Noeud {
+    int data;
+    struct Noeud *suiv;
+} Noeud;
+
+Noeud* cree(int data){
+    Noeud *New = malloc(sizeof(Noeud));
+    New->suiv = NULL;
+    New->data = data;
+    return New;
+}
+
+void affiche(Noeud *debut){
+    if(debut == NULL){
+        printf("Liste vide\n");
+        return;
+    }
+    while(debut){
+        printf("\t%d\n", debut->data);
+        debut = debut->suiv;
+    }
+}
+
+Noeud* ajouterD(Noeud *debut, int data){
+    Noeud *New = cree(data);
+    New->suiv = debut;
+    debut = New;
+    return debut;
+}
+
+Noeud* ajouterF(Noeud *debut, int data){
+    if(debut == NULL){
+        return ajouterD(debut, data);
+    }
+
+    Noeud *New = cree(data);
+    Noeud *temp = debut;
+
+    while(temp->suiv != NULL){
+        temp = temp->suiv;
+    }
+
+    temp->suiv = New;
+    return debut;
+}
+
+int taille(Noeud *debut){
+    int c = 0;
+    while(debut != NULL){
+        c++;
+        debut = debut->suiv;
+    }
+    return c;
+}
+
+Noeud* insertion(Noeud *debut, int pos, int data){
+    if(pos == 1) return ajouterD(debut, data);
+
+    if(debut == NULL){
+        printf("Liste vide\n");
+        return NULL;
+    }
+
+    Noeud *prev = debut;
+    Noeud *next = debut->suiv;
+
+    for(int i = 2; i < pos; i++){
+        if(next == NULL){
+            printf("nombre de noeuds < %d\n", pos);
+            return debut;
+        }
+        prev = next;
+        next = next->suiv;
+    }
+
+    prev->suiv = cree(data);
+    prev->suiv->suiv = next;
+
+    return debut;
+}
+
+void rechercher(Noeud *debut, int data){
+    if(debut == NULL){
+        printf("liste vide\n");
+        return;
+    }
+
+    int c = 0;
+    while(debut != NULL){
+        if(data == debut->data) c++;
+        debut = debut->suiv;
+    }
+
+    printf("Nombre d'occurence de %d = %d\n", data, c);
+}
+
+Noeud* suppressionD(Noeud *debut){
+    if(debut == NULL) return NULL;
+
+    Noeud *temp = debut;
+    debut = debut->suiv;
+    free(temp);
+
+    return debut;
+}
+
+Noeud* supressionF(Noeud *debut){
+    Noeud *P = debut;
+    while(P->suiv->suiv != NULL){
+        P = P->suiv;
+    }
+
+    free(P->suiv);
+    P->suiv = NULL;
+    return debut;
+}
+
+Noeud* suppressionP(Noeud *debut, int pos){
+    if(taille(debut) < pos || pos <= 0){
+        printf("Position invalide\n");
+        return debut;
+    }
+
+    if(pos == 1) return suppressionD(debut);
+    if(taille(debut) == pos) return supressionF(debut);
+
+    Noeud *P1 = debut;
+    Noeud *P2 = debut->suiv;
+
+    for(int i = 2; i < pos; i++){
+        P1 = P2;
+        P2 = P2->suiv;
+    }
+
+    P1->suiv = P2->suiv;
+    free(P2);
+
+    return debut;
+}
+
+void modifierD(Noeud *debut, int data){
+    debut->data = data;
+}
+
+void modifierF(Noeud *debut, int data){
+    while(debut->suiv != NULL){
+        debut = debut->suiv;
+    }
+    debut->data = data;
+}
+
+void modifierP(Noeud *debut, int pos, int data){
+    if(debut == NULL){
+        printf("Liste vide\n");
+        return;
+    }
+
+    if(pos == 1){
+        modifierD(debut, data);
+        return;
+    }
+
+    if(pos > taille(debut)){
+        printf("Position plus grand a la taille de la liste\n");
+        return;
+    }
+
+    if(taille(debut) == pos){
+        modifierF(debut, data);
+        return;
+    }
+
+    for(int i = 2; i <= pos; debut = debut->suiv, i++);
+
+    debut->data = data;
+}
+
+void remplissageAuto(Noeud *debut){
+    if(debut == NULL) return;
+
+    srand(time(NULL));
+    while(debut != NULL){
+        debut->data = rand();
+        debut = debut->suiv;
+    }
+}
+
+void remplissageManuel(Noeud *debut){
+    int c = 1;
+    if(debut == NULL) return;
+
+    while(debut != NULL){
+        printf("Entrez une valeur pour noeud %d:\n", c);
+        scanf("%d", &debut->data);
+        debut = debut->suiv;
+        c++;
+    }
+}
+
+int position(){
+    int p;
+    printf("Entrez la position\n");
+    do {
+        scanf("%d", &p);
+        if(p <= 0)
+            printf("Position invalide, entrez à nouveau\n");
+    } while(p <= 0);
+    return p;
+}
+
+int valeur(){
+    int v;
+    printf("Entrez une valeur\n");
+    scanf("%d", &v);
+    return v;
+}
+
+Noeud* creerListe(Noeud *debut){
+    int n;
+    Noeud *P, *temp;
+
+    printf("Entrez la taille de la liste:\n");
+    do {
+        scanf("%d", &n);
+        if(n <= 0)
+            printf("Taille invalide, entrez à nouveau:\n");
+    } while(n <= 0);
+
+    P = malloc(sizeof(Noeud));
+    P->suiv = NULL;
+    temp = P;
+    for(int i = 1; i < n; i++){
+        temp->suiv = malloc(sizeof(Noeud));
+        temp->suiv->suiv = NULL;
+        temp = temp->suiv;
+    }
+
+    return P;
+}
+
+int main(){
+    Noeud *Start = NULL;
+    int x, y;
+
+    do {
+        printf("\n-------Menu-------\n\n");
+        printf("0-Sortir\n");
+        printf("1-Creer une liste avec des valeurs initiales\n");
+        printf("2-Inserer un noeud a une position\n");
+        printf("3-Supprimer un noeud a une position\n");
+        printf("4-Modifier une valeur a une position\n");
+        printf("5-Rechercher l'occurence d'une valeur\n");
+        printf("6-Afficher les valeurs\n");
+        printf("7-Afficher la taille de la liste\n");
+        scanf("%d", &x);
+
+        if(x == 1){
+            do {
+                Start = creerListe(Start);
+                printf("1-Remplissage Auto\n");
+                printf("2-Remplissage Manuel\n");
+                scanf("%d", &y);
+
+                if(y == 1)
+                    remplissageAuto(Start);
+                else if(y == 2)
+                    remplissageManuel(Start);
+
+            } while(y < 1 || y > 2);
+        }
+
+        else if(x == 2){
+            Start = insertion(Start, position(), valeur());
+        }
+
+        else if(x == 3){
+            Start = suppressionP(Start, position());
+        }
+
+        else if(x == 4){
+            modifierP(Start, position(), valeur());
+        }
+
+        else if(x == 5){
+            rechercher(Start, valeur());
+        }
+
+        else if(x == 6){
+            affiche(Start);
+        }
+
+        else if(x == 7){
+            printf("\t%d\n", taille(Start));
+        }
+
+    } while(x > 0 && x <= 7);
+
+    free(Start);
+    return 0;
+}
