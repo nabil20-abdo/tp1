@@ -1,0 +1,60 @@
+#include<stdio.h>
+#include<stdlib.h>
+int main(){
+    
+    FILE *ptr ;
+    char tab[50];
+    
+    /*EXERCICE 1 */
+    remove("data.txt");
+    ptr  = fopen("data.txt","w");
+    if(ptr)
+    printf("\n\tOuverture de fichier a reussi !\n");
+
+    printf("Entrez votre age : ");
+    fflush(stdin);
+    fgets(tab,50,stdin);
+    fprintf(ptr,"Age : %s",tab);
+    printf("Entrez votre nom : ");
+    fflush(stdin);
+    fgets(tab,50,stdin);
+    fprintf(ptr,"Nom : %s",tab);
+
+    fclose(ptr);
+    /*EXERCICE 2*/
+    ptr = fopen("data.txt","r");
+    while(fgets(tab,50,ptr)){
+        printf("%s",tab);
+        fflush(stdin);
+    }
+    fclose(ptr);
+
+    /*EXERCICE 3*/
+
+    ptr = fopen("data.txt","r");
+    FILE *P = fopen("destination.txt","w");
+    char c;
+    while( (c = fgetc(ptr)) != -1 ){
+        fprintf(P,"%c",c);
+    }
+    fclose(ptr);
+    fclose(P);
+    int l=0,m=0,ca=0;
+    ptr  = fopen("data.txt","r");
+    while((c = fgetc(ptr) ) != -1){
+       
+        if(c=='\n')
+           {l++;
+        m++;
+    }
+          if(c==' '||c==',' ||c=='.')
+           m++;
+           ca++;
+
+
+    }
+printf("li=%d,m=%d,c=%d",l,m,ca);
+    
+
+    return 0 ;
+}
