@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int val;
+    struct Noeud *suivant;
+} Node;
+
+void push(Node **sommet, int val) {
+    Node *nouveau = malloc(sizeof(Node));
+    nouveau->val = val;
+    nouveau->suivant = *sommet;
+    *sommet = nouveau;
+}
+
+void pop(Node **sommet) {
+    if (!(*sommet)) return;
+    Node *temp = *sommet;
+    *sommet = (*sommet)->suivant;
+    free(temp);
+}
+
+void peek(Node *sommet) {
+    if (!sommet)
+        printf("\n\tSOMMET N'EXISTE PAS\n");
+    else
+        printf("VALEUR : %d\n", sommet->val);
+}
+
+void afficherPile(Node *sommet) {
+    if (!sommet)
+        printf("\n\tPILE VIDE\n");
+    else {
+        while (sommet) {
+            printf("VALEUR : %d\n", sommet->val);
+            sommet = sommet->suivant;
+        }
+    }
+}
+
+int taille(Node *sommet) {
+    int taille = 0;
+    while (sommet) {
+        taille++;
+        sommet = sommet->suivant;
+    }
+    return taille;
+}
+
+int main() {
+    Node *sommet = NULL;
+
+    push(&sommet, 10);
+    push(&sommet, 20);
+    push(&sommet, 30);
+
+    afficherPile(sommet);
+    printf("Taille de la pile : %d\n", taille(sommet));
+
+    pop(&sommet);
+    pop(&sommet);
+
+    afficherPile(sommet);
+
+    return 0;
+}
