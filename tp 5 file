@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int val;
+    struct Noeud *suivant;
+} Node;
+
+void Enfiler(Node **debut, int val) {
+    Node *nouveau = malloc(sizeof(Node));
+    nouveau->val = val;
+    nouveau->suivant = NULL;
+
+    if (!(*debut)) {
+        *debut = nouveau;
+    } else {
+        Node *temp = *debut;
+        while (temp->suivant != NULL)
+            temp = temp->suivant;
+        temp->suivant = nouveau;
+    }
+}
+
+void Defiler(Node **debut) {
+    if (!(*debut)) {
+        printf("\n\tLISTE VIDE\n");
+        return;
+    }
+
+    Node *temp = *debut;
+    *debut = (*debut)->suivant;
+    free(temp);
+}
+
+void afficherFile(Node *debut) {
+    if (!debut) {
+        printf("\n\tFILE VIDE\n");
+        return;
+    }
+
+    while (debut) {
+        printf("VALEUR : %d\n", debut->val);
+        debut = debut->suivant;
+    }
+}
+
+void viderFile(Node **debut) {
+    Node *temp;
+    while (*debut) {
+        temp = *debut;
+        *debut = (*debut)->suivant;
+        free(temp);
+    }
+}
+
+int main() {
+    Node *debut = NULL;
+
+    Enfiler(&debut, 10);
+    Enfiler(&debut, 20);
+    Enfiler(&debut, 30);
+
+    afficherFile(debut);
+
+    Defiler(&debut);
+    afficherFile(debut);
+
+    viderFile(&debut);
+    afficherFile(debut);
+
+    return 0;
+}
